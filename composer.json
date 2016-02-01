@@ -1,0 +1,25 @@
+{
+    "name": "yorch/v3application",
+    "description": "V3ctor WareHouse Web Application",
+    "keywords": ["WareHouse", "MongoDb", "MySQL"],
+    "homepage": "https://github.com/yorch81/v3application",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Jorge Alberto Ponce Turrubiates",
+            "email": "the.yorch@gmail.com",
+            "homepage": "http://the-yorch.blogspot.mx/"
+        }
+    ],
+    "require": {
+    	"php": ">=5.4.0",
+        "slim/slim": "2.*",
+        "yorch/v3wh" : "dev-master",
+        "monolog/monolog": "1.13.1",
+        "catfan/medoo": "dev-master"
+    },
+    "autoload": {
+        "files": ["V3Application.class.php"]
+    }
+}
