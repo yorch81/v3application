@@ -74,8 +74,6 @@ class V3Application
 		$v3ctor = V3WareHouse::getInstance($dbtype, $hostname, $username, $password, $dbname, $port);
 
 		if (! $v3ctor->isConnected()){
-			$vector->setKey($key);
-
 		    $msg = array("error" => 'Unable load V3ctor WareHouse');
 
 		    die(json_encode($msg));
