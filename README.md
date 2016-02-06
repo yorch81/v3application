@@ -48,7 +48,9 @@ $app->addRoute('/openshift', function () {
 
 		        $msg = array("msg" => "Hello localhost !!!");
 
-		        if (is_null(getenv('OPENSHIFT_MONGODB_DB_HOST')))
+		        $envvar = getenv('OPENSHIFT_MONGODB_DB_HOST');
+
+		        if (! empty($envvar))
 		        	$msg = array("msg" => "Hello Openshift !!!");
 		        
 		        echo json_encode($msg);
@@ -56,6 +58,7 @@ $app->addRoute('/openshift', function () {
 
 // Start V3ctor Application
 $app->start();
+
 ?>
 
 ~~~
