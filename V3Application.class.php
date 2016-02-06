@@ -36,42 +36,39 @@ class V3Application
 	private $_key = null;
 
 	/**
-	 * V3ctorWH Application
+	 * V3ctorWH Application Name
 	 *
-	 * @var string $_app V3ctorWH Application
+	 * @var string $_app V3ctorWH Application Name
 	 * @access private
 	 */
 	private $_app = null;
 
 	/**
-	 * Supported Databases
+	 * Slim Web Application 
+	 *
+	 * @var \Slim\Slim $web Slim Web Application 
+	 * @access private
 	 */
-	const MONGODB = 'v3Mongo';
-	const MSSQLSERVER = 'v3MySQL';
-	const MYSQL = 'v3SQLSrv';
+	private $web = null;
 
 	/**
 	 * Create a Slim WebServices Application
 	 *
-	 * @param string $dbtype   DataBase Type
-	 * @param string $hostname Hostname
-	 * @param string $username User Name
-	 * @param string $password Password
-	 * @param string $dbname   DataBase Name
-	 * @param string $port     DataBase Name
+	 * @param string $appName  Application Name
 	 * @param string $key      V3ctor WareHouse Key
 	 */
-	public function __construct($dbtype = self::MONGODB, $hostname, $username, $password, $dbname, $port, $key) {
+	public function __construct($appName, $key) {
 		$this->_key = $key;
-		$this->_app = $dbname;
+		$this->_app = $appName;
 
 		// Load Slim Application
 		\Slim\Slim::registerAutoloader();
 
-		$app = new \Slim\Slim();
+		// Init Slim Application
+		$this->web = new \Slim\Slim();
 
 		// Run WebServices Application
-		$v3ctor = V3WareHouse::getInstance($dbtype, $hostname, $username, $password, $dbname, $port);
+		$v3ctor = V3WareHouse::getInstance();
 
 		if (! $v3ctor->isConnected()){
 		    $msg = array("error" => 'Unable load V3ctor WareHouse');
@@ -79,10 +76,13 @@ class V3Application
 		    die(json_encode($msg));
 		}
 
+		// Add Default Routes
 		// Welcome
-		$app->get(
+		$this->web->get(
 		    '/',
-		    function () use ($app, $v3ctor) {
+		    function () {
+		    	$app = \Slim\Slim::getInstance();
+
 		        $app->response()->header('Content-Type', 'application/json');
 		        
 		        $app->response()->status(200);
@@ -94,10 +94,13 @@ class V3Application
 		);
 
 		// Gets Object by _id
-		$app->get(
+		$this->web->get(
 		    '/(:entity)/(:id)',
-		    function ($entity, $id) use ($app, $v3ctor) {
-		    	$this->checkKey($app);
+		    function ($entity, $id) {
+		    	$app = \Slim\Slim::getInstance();
+		    	$v3ctor = V3WareHouse::getInstance();
+
+		    	$this->validateKey($app);
 
 		        $app->response()->header('Content-Type', 'application/json');
 		        $app->response()->status(200);  
@@ -107,10 +110,13 @@ class V3Application
 		);
 
 		// Sets a New Object
-		$app->post(
+		$this->web->post(
 		    '/(:entity)',
-		    function ($entity) use ($app, $v3ctor) {
-		    	$this->checkKey($app);
+		    function ($entity) {
+		    	$app = \Slim\Slim::getInstance();
+		    	$v3ctor = V3WareHouse::getInstance();
+
+		    	$this->validateKey($app);
 
 		        try{
 		            $body = $app->request->getBody();
@@ -132,10 +138,13 @@ class V3Application
 		);
 
 		// Update a Object
-		$app->put(
+		$this->web->put(
 		    '/(:entity)/(:id)',
-		    function ($entity, $id) use ($app, $v3ctor) {
-		    	$this->checkKey($app);
+		    function ($entity, $id) {
+		    	$app = \Slim\Slim::getInstance();
+		    	$v3ctor = V3WareHouse::getInstance();
+
+		    	$this->validateKey($app);
 
 		        try{
 		            $body = $app->request->getBody();
@@ -165,10 +174,13 @@ class V3Application
 		);
 
 		// Delete a Object
-		$app->delete(
+		$this->web->delete(
 		    '/(:entity)/(:id)',
-		    function ($entity, $id) use ($app, $v3ctor) {   
-		    	$this->checkKey($app);
+		    function ($entity, $id) {   
+		    	$app = \Slim\Slim::getInstance();
+		    	$v3ctor = V3WareHouse::getInstance();
+
+		    	$this->validateKey($app);
 
 		        $app->response()->header('Content-Type', 'application/json');
 		        $app->response()->status(200);  
@@ -186,10 +198,13 @@ class V3Application
 		);
 
 		// Find Objects by Query
-		$app->post(
+		$this->web->post(
 		    '/query/(:entity)',
-		    function ($entity) use ($app, $v3ctor) {
-		    	$this->checkKey($app);
+		    function ($entity) {
+		    	$app = \Slim\Slim::getInstance();
+		    	$v3ctor = V3WareHouse::getInstance();
+
+		    	$this->validateKey($app);
 
 		        try{
 		            $body = $app->request->getBody();
@@ -214,9 +229,11 @@ class V3Application
 		);
 
 		// Not Sent Key
-		$app->get(
+		$this->web->get(
 		    '/notkey',
-		    function () use ($app) {
+		    function () {
+		    	$app = \Slim\Slim::getInstance();
+
 		        $app->response()->header('Content-Type', 'application/json');
 		        $app->response()->status(404);
 
@@ -227,9 +244,11 @@ class V3Application
 		);
 
 		// Not Valid Key
-		$app->get(
+		$this->web->get(
 		    '/invalidkey',
-		    function () use ($app) {
+		    function () {
+		    	$app = \Slim\Slim::getInstance();
+
 		        $app->response()->header('Content-Type', 'application/json');
 		        $app->response()->status(404);
 
@@ -238,15 +257,29 @@ class V3Application
 		        echo json_encode($msg);
 		    }
 		);
+	}
 
-		// Run Slim Application
-		$app->run();
+	/**
+	 * Start Slim Application
+	 */
+	public function start(){
+		$this->web->run();
+	}
+
+	/**
+	 * Add Route to Slim Application
+	 * 
+	 * @param string   $route    Route
+	 * @param function $callback CallBack Route
+	 */
+	public function addRoute($route, $callback){
+		$this->web->get($route, $callback);
 	}
 
 	/**
 	 * Validate Sent Key
 	 */
-	private function checkKey(){
+	private function validateKey(){
 		$app = \Slim\Slim::getInstance();
 		$key = $app->request->params('auth');
 
