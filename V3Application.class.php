@@ -257,6 +257,206 @@ class V3Application
 		        echo json_encode($msg);
 		    }
 		);
+
+		/************************* JSONP *************************/
+
+		// Gets Object by _id
+		$this->web->get(
+		    '/jsonp/get/(:entity)/(:id)',
+		    function ($entity, $id) {
+		    	$app = \Slim\Slim::getInstance();
+		    	$v3ctor = V3WareHouse::getInstance();
+
+		    	$this->validateKey($app);
+
+		    	$callback = $app->request()->get('callback');
+
+		        if (is_null($callback)) {
+		        	$app->response()->status(400);
+		        }
+		        else {
+		        	try{
+			            $app->response()->header('Content-type: text/javascript');
+				        $app->response()->status(200);
+
+				        $jsonResult = json_encode($v3ctor->findObject($entity, $id));
+
+				        echo "$callback(" . $jsonResult . ");";
+			        }
+			        catch (ResourceNotFoundException $e) {
+			            $app->response()->status(404);
+			        } 
+			        catch (Exception $e) {
+			            $app->response()->status(400);
+			            $app->response()->header('X-Status-Reason', $e->getMessage());
+			        }
+		        }
+		    }
+		);
+
+		// Find Objects by Query
+		$this->web->get(
+		    '/jsonp/query/(:entity)',
+		    function ($entity) {
+		    	$app = \Slim\Slim::getInstance();
+		    	$v3ctor = V3WareHouse::getInstance();
+
+		    	$this->validateKey($app);
+
+		    	$callback = $app->request()->get('callback');
+
+		        if (is_null($callback)) {
+		        	$app->response()->status(400);
+		        }
+		        else {
+		        	try{
+			            $app->response()->header('Content-type: text/javascript');
+				        $app->response()->status(200);
+
+				        $jsonData = $app->request()->get('data');
+
+				        $jsonData = json_decode($jsonData);
+
+				        $jsonResult = json_encode($v3ctor->query($entity, $jsonData));
+
+				        echo "$callback(" . $jsonResult . ");";
+			        }
+			        catch (ResourceNotFoundException $e) {
+			            $app->response()->status(404);
+			        } 
+			        catch (Exception $e) {
+			            $app->response()->status(400);
+			            $app->response()->header('X-Status-Reason', $e->getMessage());
+			        }
+		        }
+		    }
+		);
+
+		// Sets a New Object
+		$this->web->get(
+		    '/jsonp/new/(:entity)',
+		    function ($entity) {
+		    	$app = \Slim\Slim::getInstance();
+		    	$v3ctor = V3WareHouse::getInstance();
+
+		    	$this->validateKey($app);
+
+		    	$callback = $app->request()->get('callback');
+
+		        if (is_null($callback)) {
+		        	$app->response()->status(400);
+		        }
+		        else {
+		        	try{
+			            $app->response()->header('Content-type: text/javascript');
+				        $app->response()->status(200);
+
+				        $jsonData = $app->request()->get('data');
+
+				        $jsonData = json_decode($jsonData);
+
+				        $jsonResult = json_encode($v3ctor->newObject($entity, $jsonData));
+
+				        echo "$callback(" . $jsonResult . ");";
+			        }
+			        catch (ResourceNotFoundException $e) {
+			            $app->response()->status(404);
+			        } 
+			        catch (Exception $e) {
+			            $app->response()->status(400);
+			            $app->response()->header('X-Status-Reason', $e->getMessage());
+			        }
+		        }
+		    }
+		);
+
+		// Update a Object
+		$this->web->get(
+		    '/jsonp/upd/(:entity)/(:id)',
+		    function ($entity, $id) {
+		    	$app = \Slim\Slim::getInstance();
+		    	$v3ctor = V3WareHouse::getInstance();
+
+		    	$this->validateKey($app);
+
+		    	$callback = $app->request()->get('callback');
+
+		    	if (is_null($callback)) {
+		        	$app->response()->status(400);
+		        }
+		        else {
+		        	try{
+			            $app->response()->header('Content-type: text/javascript');
+				        $app->response()->status(200);
+
+				        $jsonData = $app->request()->get('data');
+
+				        $jsonData = json_decode($jsonData);
+
+				        $msgOk = array('msg' => 'OK');
+		            	$msgBad = array('msg' => 'ERROR');
+
+		            	$result = $v3ctor->updateObject($entity, $id, $jsonData);
+
+		            	if ($result)
+			                $jsonResult = json_encode($msgOk);
+			            else
+			                $jsonResult = json_encode($msgBad);
+
+				        echo "$callback(" . json_encode($jsonResult) . ");";
+			        }
+			        catch (ResourceNotFoundException $e) {
+			            $app->response()->status(404);
+			        } 
+			        catch (Exception $e) {
+			            $app->response()->status(400);
+			            $app->response()->header('X-Status-Reason', $e->getMessage());
+			        }
+		        }
+		    }
+		);
+		
+		// Delete a Object
+		$this->web->get(
+		    '/jsonp/del/(:entity)/(:id)',
+		    function ($entity, $id) {   
+		    	$app = \Slim\Slim::getInstance();
+		    	$v3ctor = V3WareHouse::getInstance();
+
+		    	$this->validateKey($app);
+
+		    	$callback = $app->request()->get('callback');
+
+		    	if (is_null($callback)) {
+		        	$app->response()->status(400);
+		        }
+		        else {
+		        	try{
+			            $app->response()->header('Content-type: text/javascript');
+				        $app->response()->status(200);
+
+				        $msgOk = array('msg' => 'OK');
+		            	$msgBad = array('msg' => 'ERROR');
+
+		            	$result = $v3ctor->deleteObject($entity, $id);
+
+		            	if ($result)
+			                $jsonResult = json_encode($msgOk);
+			            else
+			                $jsonResult = json_encode($msgBad);
+
+				        echo "$callback(" . json_encode($jsonResult) . ");";
+			        }
+			        catch (ResourceNotFoundException $e) {
+			            $app->response()->status(404);
+			        } 
+			        catch (Exception $e) {
+			            $app->response()->status(400);
+			            $app->response()->header('X-Status-Reason', $e->getMessage());
+			        }
+		        }
+		    }
+		);
 	}
 
 	/**
