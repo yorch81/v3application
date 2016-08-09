@@ -403,7 +403,7 @@ class V3Application
 			            else
 			                $jsonResult = json_encode($msgBad);
 
-				        echo "$callback(" . json_encode($jsonResult) . ");";
+				        echo "$callback(" . $jsonResult . ");";
 			        }
 			        catch (ResourceNotFoundException $e) {
 			            $app->response()->status(404);
@@ -445,7 +445,7 @@ class V3Application
 			            else
 			                $jsonResult = json_encode($msgBad);
 
-				        echo "$callback(" . json_encode($jsonResult) . ");";
+				        echo "$callback(" . $jsonResult . ");";
 			        }
 			        catch (ResourceNotFoundException $e) {
 			            $app->response()->status(404);
