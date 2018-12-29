@@ -17,7 +17,7 @@
         "slim/slim": "2.*",
         "yorch/v3wh" : "dev-master",
         "monolog/monolog": "1.13.1",
-        "catfan/medoo": "dev-master"
+        "catfan/medoo": "v1.1.2"
     },
     "autoload": {
         "files": ["V3Application.class.php"]

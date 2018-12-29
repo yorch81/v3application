@@ -34,7 +34,10 @@ require 'config.php';
 require 'vendor/autoload.php';
 
 // Init Database Connection
-V3WareHouse::getInstance("v3Mongo", $hostname, $username, $password, $dbname, $port);
+//V3WareHouse::getInstance("v3Mongo", $hostname, $username, $password, $dbname, $port);
+
+// For PHP 7
+V3WareHouse::getInstance("v3MongoDB", $hostname, $username, $password, $dbname, $port);
 
 // Init Application
 $app = new V3Application($dbname, $key);
